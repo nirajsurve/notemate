@@ -16,6 +16,7 @@ public class ApiResponse<T> {
     private boolean success;
     private String message;
     private T data;
+    private String error;
 
     public static <T> ApiResponse<T> success(String message, T data) {
         return ApiResponse.<T>builder()
@@ -23,15 +24,16 @@ public class ApiResponse<T> {
                 .success(true)
                 .message(message)
                 .data(data)
+                .error(null)
                 .build();
     }
 
-    public static <T> ApiResponse<T> error(String message) {
+    public static <T> ApiResponse<T> error(String error) {
         return ApiResponse.<T>builder()
                 .timestamp(LocalDateTime.now())
                 .success(false)
-                .message(message)
-                .data(null)
+                .message("Error occurred!")
+                .error(error)
                 .build();
     }
 }

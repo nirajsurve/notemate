@@ -1,0 +1,6 @@
+spring:
+    data:                       # database properties
+        mongodb:
+            uri: your_mongodb_atlas_connection_uri
+            database: your_database_name
+            auto-index-creation: true

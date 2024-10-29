@@ -1,10 +1,7 @@
 package com.notemate.app.service;
 
-import com.notemate.app.entity.User;
+import com.notemate.app.dto.data.UserData;
 
 public interface UserService {
-
-    User saveNewUser(String username, String password);
-
-    User signIn(String username, String password);
+    UserData getUserDetails(String username);
 }

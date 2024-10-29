@@ -1,10 +1,15 @@
 package com.notemate.app.controller;
 
-import com.notemate.app.dto.request.UserRequest;
+import com.notemate.app.dto.request.SigninRequest;
+import com.notemate.app.dto.request.SignupRequest;
 import com.notemate.app.dto.response.ApiResponse;
 import com.notemate.app.entity.User;
-import com.notemate.app.service.UserService;
+import com.notemate.app.exceptions.InternalServerErrorException;
+import com.notemate.app.service.AuthService;
 import com.notemate.app.utils.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,37 +17,42 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/public")
+@RequestMapping("/api/v1/auth")
+@Tag(name = "Authentication API (Public)", description = "API for checking health of the api and user authentication")
 public class PublicController {
 
-    private final UserService userService;
+    private final AuthService authService;
     private final JwtUtil jwtUtil;
 
     @GetMapping("/health-check")
+    @Operation(summary = "Health Check", description = "Check health of our api")
     public ResponseEntity<ApiResponse<String>> healthCheck() {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("OK", null));
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<ApiResponse<User>> signUp(@RequestBody UserRequest request) {
-        User newUser = userService.saveNewUser(request.getUsername(), request.getPassword());
+    @Operation(summary = "Sign up", description = "Sign up as a new user")
+    public ResponseEntity<ApiResponse<String>> signUp(@Valid @RequestBody SignupRequest request) {
+        User newUser = authService.saveNewUser(request.getName(), request.getEmail(), request.getUsername(), request.getPassword());
 
         if (newUser != null) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("User Created Successfully!", newUser));
+            return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("User Created Successfully!", null));
         }
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error("Internal Server Error!"));
+        throw new InternalServerErrorException("Internal Server Error!");
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<ApiResponse<String>> signIn(@RequestBody UserRequest request) {
-        User userDetails = userService.signIn(request.getUsername(), request.getPassword());
+    @Operation(summary = "Sign in", description = "Sign in as a existing user")
+    public ResponseEntity<ApiResponse<String>> signIn(@Valid @RequestBody SigninRequest request) {
+        User userDetails = authService.signIn(request.getUsername(), request.getPassword());
 
         if (userDetails != null) {
             String token = jwtUtil.generateToken(userDetails.getUsername());
             return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("User sign-in successful!", token));
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error("Internal Server Error"));
+
+        throw new InternalServerErrorException("Internal Server Error!");
     }
 
 }

@@ -22,6 +22,10 @@ public class User {
     @Id
     private ObjectId id;
 
+    private String name;
+
+    private String email;
+
     @Indexed(unique = true)
     @NonNull
     private String username;

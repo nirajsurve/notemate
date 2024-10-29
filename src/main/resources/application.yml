@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: notemate
+  devtools:
+    add-properties: false
+  output:                   # color logs property
+    ansi:
+      enabled: ALWAYS
+  main:                     # banner off property
+    banner-mode: off
+  profiles:
+    active: dev
+
+logging:                        # logger properties
+  level:
+    org:
+      springframework: WARN
+      mongodb:
+        driver: WARN
+
+springdoc:                      # swagger properties
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /api-docs/ui
