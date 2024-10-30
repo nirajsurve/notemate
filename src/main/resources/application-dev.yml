@@ -1,6 +1,0 @@
-spring:
-    data:                       # database properties
-        mongodb:
-            uri: mongodb+srv://journal:journalapp@journalapp.oqccv.mongodb.net/?retryWrites=true&w=majority&appName=journalapp
-            database: notematedb
-            auto-index-creation: true
