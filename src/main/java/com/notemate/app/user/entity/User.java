@@ -3,9 +3,7 @@ package com.notemate.app.user.entity;
 
 import com.notemate.app.note.entity.Note;
 import com.notemate.app.user.constant.Role;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -17,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "users")
 public class User {

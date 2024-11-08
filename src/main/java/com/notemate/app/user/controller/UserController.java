@@ -1,8 +1,8 @@
 package com.notemate.app.user.controller;
 
+import com.notemate.app.common.dto.response.CustomApiResponse;
 import com.notemate.app.common.exception.InternalServerErrorException;
 import com.notemate.app.user.dto.data.UserData;
-import com.notemate.app.user.dto.response.ApiResponse;
 import com.notemate.app.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,11 +26,11 @@ public class UserController {
     @GetMapping
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Get User Details", description = "Get the user details")
-    public ResponseEntity<ApiResponse<UserData>> getUserData(Authentication authentication){
+    public ResponseEntity<CustomApiResponse<UserData>> getUserData(Authentication authentication){
         UserData userData = userService.getUserDetails(authentication.getName());
 
         if(userData != null){
-            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("User data fetched successfully!", userData));
+            return ResponseEntity.status(HttpStatus.OK).body(CustomApiResponse.success("User data fetched successfully!", userData));
         }
 
         throw new InternalServerErrorException("Internal Server Error!");

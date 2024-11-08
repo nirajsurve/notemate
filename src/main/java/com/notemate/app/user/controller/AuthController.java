@@ -1,13 +1,16 @@
 package com.notemate.app.user.controller;
 
+import com.notemate.app.common.dto.response.CustomApiResponse;
+import com.notemate.app.common.exception.InternalServerErrorException;
+import com.notemate.app.common.util.JwtUtil;
 import com.notemate.app.user.dto.request.SigninRequest;
 import com.notemate.app.user.dto.request.SignupRequest;
-import com.notemate.app.user.dto.response.ApiResponse;
 import com.notemate.app.user.entity.User;
-import com.notemate.app.common.exception.InternalServerErrorException;
 import com.notemate.app.user.service.AuthService;
-import com.notemate.app.common.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,17 +29,25 @@ public class AuthController {
 
     @GetMapping("/health-check")
     @Operation(summary = "Health Check", description = "Check health of our api")
-    public ResponseEntity<ApiResponse<String>> healthCheck() {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("OK", null));
+    @ApiResponse(
+            responseCode = "200",
+            description = "API is healthy",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = CustomApiResponse.class)
+            )
+    )
+    public ResponseEntity<CustomApiResponse<String>> healthCheck() {
+        return ResponseEntity.status(HttpStatus.OK).body(CustomApiResponse.success("API is healthy", null));
     }
 
     @PostMapping("/sign-up")
     @Operation(summary = "Sign up", description = "Sign up as a new user")
-    public ResponseEntity<ApiResponse<String>> signUp(@Valid @RequestBody SignupRequest request) {
-        User newUser = authService.saveNewUser(request.getName(), request.getEmail(), request.getUsername(), request.getPassword());
+    public ResponseEntity<CustomApiResponse<String>> signUp(@Valid @RequestBody SignupRequest request) {
+        User newUser = authService.signUp(request.getName(), request.getEmail(), request.getUsername(), request.getPassword());
 
         if (newUser != null) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("User Created Successfully!", null));
+            return ResponseEntity.status(HttpStatus.CREATED).body(CustomApiResponse.success("User Created Successfully!", null));
         }
 
         throw new InternalServerErrorException("Internal Server Error!");
@@ -44,12 +55,12 @@ public class AuthController {
 
     @PostMapping("/sign-in")
     @Operation(summary = "Sign in", description = "Sign in as a existing user")
-    public ResponseEntity<ApiResponse<String>> signIn(@Valid @RequestBody SigninRequest request) {
+    public ResponseEntity<CustomApiResponse<String>> signIn(@Valid @RequestBody SigninRequest request) {
         User userDetails = authService.signIn(request.getUsername(), request.getPassword());
 
         if (userDetails != null) {
             String token = jwtUtil.generateToken(userDetails.getUsername());
-            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("User sign-in successful!", token));
+            return ResponseEntity.status(HttpStatus.OK).body(CustomApiResponse.success("User sign-in successful!", token));
         }
 
         throw new InternalServerErrorException("Internal Server Error!");

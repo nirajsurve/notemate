@@ -28,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public User saveNewUser(String name, String email, String username, String password) {
+    public User signUp(String name, String email, String username, String password) {
         Optional<User> existingUser = userRepository.findByUsername(username);
 
         if(existingUser.isPresent()){
